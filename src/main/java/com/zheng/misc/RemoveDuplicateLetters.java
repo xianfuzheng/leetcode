@@ -6,43 +6,48 @@ import java.util.Stack;
 public class RemoveDuplicateLetters {
 
     public String removeDuplicateLetters(String s) {
-        int [] arr = new int[26];
         char [] chars = s.toCharArray();
-        for(char c: chars) {
-            arr[c - 'a'] ++;
-        }
-
         Stack<Character> stack = new Stack<>();
+
         boolean [] visited = new boolean[26];
+        int [] arr = new int[26];
+
+        for(char c: chars) {
+            arr[c-'a'] ++;
+        }
 
         for(char c: chars) {
             arr[c-'a'] --;
-            if( visited[c-'a']) {
+            if(visited[c-'a']) {
                 continue;
             }
-            while(!stack.isEmpty()) {
-                Character top = stack.peek();
-                if( c > top ) {
-                    break;
-                } else {
-                    if(arr[top - 'a']>0) {
-                        stack.pop();
-                        visited[top-'a'] = false;
-                    } else {
+
+            if(stack.isEmpty()) {
+                stack.push(c);
+                visited[c-'a'] = true;
+            } else {
+
+                while( !stack.isEmpty() ) {
+                    char peek = stack.peek();
+                    if(arr[peek-'a'] == 0) {
                         break;
                     }
+                    if( peek < c) {
+                        break;
+                    }
+                    stack.pop();
+                    visited[peek-'a'] = false;
                 }
+                stack.push(c);
+                visited[c-'a'] = true;
             }
-
-            stack.push(c);
-            visited[c-'a'] = true;
         }
 
-        StringBuffer stringBuffer = new StringBuffer();
-        while (!stack.isEmpty()) {
-            stringBuffer.append(stack.pop());
+        StringBuffer sb = new StringBuffer();
+        while(!stack.isEmpty()) {
+            sb.append(stack.pop());
         }
-        return stringBuffer.reverse().toString();
+        return sb.reverse().toString();
     }
 
     public String removeDuplicateLettersGreedy2(String s) {
@@ -91,33 +96,49 @@ public class RemoveDuplicateLetters {
     }
 
     public String removeDuplicateLettersGreedy(String s) {
+
         if( s.length()<2 )
             return s;
-        int[] count = new int[26];
-        StringBuilder result = new StringBuilder();
 
-        while( s.length()>0 ){
-            for( int i=0; i<s.length(); i++ )
-                count[ s.charAt(i)-'a' ]++;
+        char [] chars = s.toCharArray();
+        int len = chars.length;
 
-            int pos=0;
-            for( int i=0; i<s.length(); i++ ){
-                if( s.charAt(i) < s.charAt(pos) )  //always choose the left lexically smallest char
-                    pos = i;
+        int pos = 0;
+        StringBuffer sb = new StringBuffer();
+        boolean [] visited = new boolean[26];
 
-                //if a char will not appear in the following sequence, stop here, otherwise the chars of the result may not be in correct order,
-                //e.g. "eeffga", 'a' will be selected first;  we must maintain the relative order of chars in the result according to the input
-                if( --count[s.charAt(i)-'a'] == 0 )
-                    break;
+        while( pos < len) {
+            int [] arr = new int[26];
+
+            for(int i=pos; i< len ; i++) {
+                arr[chars[i] - 'a'] ++;
             }
 
-            result.append( s.charAt(pos) );
-            s = s.substring(pos + 1);
-            Arrays.fill(count, 0);
+            int min = pos;
+
+            for(int i=pos; i< len ; i++) {
+                if(visited[ chars[i] -'a']) {
+                    continue;
+                }
+
+                if( chars[i] < chars[min]) {
+                    min = i;
+                }
+
+                arr[chars[i] - 'a'] --;
+                if(arr[chars[i] - 'a']  == 0 ) {
+                    break;
+                }
+            }
+            char c = chars[min];
+            if(!visited[c-'a']) {
+                sb.append(c);
+            }
+            visited[c-'a'] = true;
+            pos = min +1;
         }
 
-        return result.toString();
+        return sb.toString();
     }
-
 
 }
