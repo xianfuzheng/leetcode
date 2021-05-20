@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,7 +26,7 @@ class DAGTest {
         dependencyList.add("B->C,D");
         dependencyList.add("E->D");
 
-        List<String> str = dag.solve(list, dependencyList);
+        Set<String> str = dag.solve(list, dependencyList);
         System.out.println(str);
     }
 }
